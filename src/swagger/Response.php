@@ -3,7 +3,7 @@
 namespace m8rge\swagger;
 
 
-class Response extends Object
+class Response extends BaseObject
 {
     /**
      * @var Schema
@@ -20,7 +20,7 @@ class Response extends Object
      */
     public $examples;
 
-    public function setSchema($value)
+    public function setSchema($value): void
     {
         $this->schema = new Schema($value);
     }

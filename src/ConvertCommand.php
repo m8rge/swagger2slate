@@ -15,12 +15,12 @@ use Twig_SimpleFilter;
 
 class ConvertCommand
 {
-    function __invoke(Application $app, InputInterface $input, OutputInterface $output, $inputFile, $outputFile)
+    public function __invoke(Application $app, InputInterface $input, OutputInterface $output, $inputFile, $outputFile)
     {
         $config = $this->loadConfig($inputFile);
         
-        if ($config['swagger'] != '2.0') {
-            throw new \Exception('Swagger version must be 2.0');
+        if ($config['swagger'] !== '2.0') {
+            throw new \RuntimeException('Swagger version must be 2.0');
         }
         
         Swagger::$root = $config;
@@ -105,9 +105,9 @@ class ConvertCommand
 
         if (array_key_exists($httpStatus, $statusTexts)) {
             return $statusTexts[$httpStatus];
-        } else {
-            return '';
         }
+
+        return '';
     }
 
     /**
@@ -118,25 +118,26 @@ class ConvertCommand
     private function loadConfig($inputFile)
     {
         if (!file_exists($inputFile)) {
-            throw new \Exception("File $inputFile doesn't exists");
+            throw new \RuntimeException("File $inputFile doesn't exists");
         }
         
         $extension = pathinfo($inputFile, PATHINFO_EXTENSION);
-        if ($extension == 'json') {
+        if ($extension === 'json') {
             $config = json_decode(file_get_contents($inputFile), true);
             return $config;
-        } elseif ($extension == 'yml') {
+        }
+        if ($extension === 'yml') {
             $config = Yaml::parse(file_get_contents($inputFile));
             return $config;
-        } else {
-            throw new \Exception('Wrong file type. Acceptable json or yml formats');
         }
+
+        throw new \RuntimeException('Wrong file type. Acceptable json or yml formats');
     }
 
     /**
      * @return Twig_Environment
      */
-    private function getTwig()
+    private function getTwig(): Twig_Environment
     {
         $loader = new Twig_Loader_Filesystem(__DIR__ . '/views');
         $twig = new Twig_Environment($loader, [
@@ -149,7 +150,7 @@ class ConvertCommand
             return new Parameters($data);
         }));
         $twig->addFilter(new Twig_SimpleFilter('multilineInTable', function ($data) {
-            return str_replace("\n", "<br/>", $data);
+            return str_replace("\n", '<br/>', $data);
         }));
         $twig->addFilter(new Twig_SimpleFilter('textStatus', [$this, 'httpTextStatus']));
         

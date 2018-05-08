@@ -5,7 +5,7 @@ namespace m8rge\swagger;
 
 use IteratorAggregate;
 
-class Parameters extends Object implements IteratorAggregate
+class Parameters extends BaseObject implements IteratorAggregate
 {
     /**
      * @var Parameter[]
@@ -17,7 +17,7 @@ class Parameters extends Object implements IteratorAggregate
         $this->parameters[$value['name']] = new Parameter($value);
     }
 
-    function __get($name)
+    public function __get($name)
     {
         return $this->parameters[$name];
     }
@@ -26,7 +26,7 @@ class Parameters extends Object implements IteratorAggregate
     {
         $res = null;
         foreach ($this->parameters as $name => $parameter) {
-            if ($parameter->in == 'body') {
+            if ($parameter->in === 'body') {
                 if (!is_array($res)) {
                     $res = [];
                 }
@@ -41,7 +41,7 @@ class Parameters extends Object implements IteratorAggregate
     {
         $res = null;
         foreach ($this->parameters as $name => $parameter) {
-            if ($parameter->in == 'header') {
+            if ($parameter->in === 'header') {
                 if (!is_array($res)) {
                     $res = [];
                 }

@@ -3,7 +3,7 @@
 namespace m8rge\swagger;
 
 
-class Swagger extends Object
+class Swagger extends BaseObject
 {
     public static $root;
 
@@ -67,7 +67,7 @@ class Swagger extends Object
      */
     public $tags;
 
-    public function setSecurityDefinitions($config)
+    public function setSecurityDefinitions($config): void
     {
         $this->securityDefinitions = [];
         foreach ($config as $name => $innerConfig) {
@@ -75,7 +75,7 @@ class Swagger extends Object
         }
     }
 
-    public function setResponses($config)
+    public function setResponses($config): void
     {
         $this->responses = [];
         foreach ($config as $name => $innerConfig) {
@@ -83,7 +83,7 @@ class Swagger extends Object
         }
     }
 
-    public function getPathsByTag($tag)
+    public function getPathsByTag($tag): array
     {
         $methods = ['get', 'post', 'put', 'delete', 'options', 'head', 'path'];
         $res = [];
@@ -91,7 +91,7 @@ class Swagger extends Object
             foreach ($methods as $method) {
                 if (array_key_exists($method, $pathItem) &&
                     array_key_exists('tags', $pathItem[$method]) &&
-                    in_array($tag, $pathItem[$method]['tags'])
+                    in_array($tag, $pathItem[$method]['tags'], true)
                 ) {
                     $res[$endPoint][$method] = $pathItem[$method];
                 }

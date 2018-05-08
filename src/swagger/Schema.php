@@ -3,7 +3,7 @@
 namespace m8rge\swagger;
 
 
-class Schema extends Object
+class Schema extends BaseObject
 {
     /**
      * @var string
@@ -45,14 +45,14 @@ class Schema extends Object
      */
     public $required = [];
 
-    protected $isRef = null;
+    protected $isRef;
 
-    public function setItems($value)
+    public function setItems($value): void
     {
-        $this->items = new Schema($value);
+        $this->items = new self($value);
     }
 
-    public function setRequired($value)
+    public function setRequired($value): void
     {
         $this->required = array_merge($this->required, $value);
     }
@@ -62,18 +62,20 @@ class Schema extends Object
         return $this->toString();
     }
 
-    public function toString($md = true)
+    public function toString($md = true): string
     {
         if ($this->title) {
-            return $this->isRef && $md ? "[$this->title](#" . strtolower($this->title) . ")" : $this->title;
-        } elseif ($this->type == 'array') {
-            return 'array[' . $this->items->toString($md) . ']';
-        } else {
-            return $this->type;
+            return $this->isRef && $md ? "[$this->title](#" . strtolower($this->title) . ')' : $this->title;
         }
+
+        if ($this->type === 'array') {
+            return 'array[' . $this->items->toString($md) . ']';
+        }
+
+        return $this->type;
     }
 
-    public function setRef($value)
+    public function setRef($value): void
     {
         $value = str_replace('#/', '', $value);
         $pathEntries = explode('/', $value);
@@ -87,14 +89,14 @@ class Schema extends Object
             if (!$this->title) {
                 $array['title'] = end($pathEntries);
             }
-            if (is_null($this->isRef)) {
+            if (null === $this->isRef) {
                 $array['isRef'] = true;
             }
         }
         $this->setConfig($array);
     }
 
-    public function setAllOf($value)
+    public function setAllOf($value): void
     {
         $this->title = 'object';
         $this->isRef = false;
@@ -103,10 +105,10 @@ class Schema extends Object
         }
     }
 
-    public function setProperties($value)
+    public function setProperties($value): void
     {
         foreach ($value as $name => $obj) {
-            $this->properties[$name] = new Schema($obj);
+            $this->properties[$name] = new self($obj);
         }
     }
 
@@ -115,32 +117,34 @@ class Schema extends Object
         if ($this->properties) {
             $res = [];
             foreach ($this->properties as $name => $schema) {
-                if ($schema->type == 'object') {
+                if ($schema->type === 'object') {
                     $res[$name] = $schema->getObject();
-                } elseif ($schema->type == 'array') {
+                } elseif ($schema->type === 'array') {
                     $res[$name] = [$schema->items->getObject()];
                 } else {
                     $res[$name] = $schema->type;
                 }
             }
             return $res;
-        } else {
-            if ($this->type == 'object') {
-                # an object with no defined properties
-                return $this->type;
-            } elseif ($this->type == 'array') {
-                return [$this->items->getObject()];
-            } else {
-                return $this->type;
-            }
         }
+
+        if ($this->type === 'object') {
+            # an object with no defined properties
+            return $this->type;
+        }
+
+        if ($this->type === 'array') {
+            return [$this->items->getObject()];
+        }
+
+        return $this->type;
     }
 
-    public function getPropertiesDescription()
+    public function getPropertiesDescription(): array
     {
         $res = [];
         foreach ($this->properties as $name => $schema) {
-            $res[$name] = $schema->description ? $schema->description : (string)$schema;
+            $res[$name] = $schema->description ?: (string)$schema;
         }
 
         return $res;

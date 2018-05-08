@@ -3,20 +3,20 @@
 namespace m8rge\swagger;
 
 
-class Object // implements ArrayAccess
+class BaseObject // implements ArrayAccess
 {
-    public function __construct($config = [])
+    public function __construct(array $config = [])
     {
         $this->setConfig($config);
         $this->init();
     }
 
-    public function init()
+    public function init(): void
     {
         
     }
 
-    public function setConfig($config = [])
+    public function setConfig(array $config = []): void
     {
         if (!empty($config)) {
             foreach ($config as $name => $value) {
@@ -24,19 +24,41 @@ class Object // implements ArrayAccess
             }
         }
     }
-    
+
+    /**
+     * @param string $name
+     * @param mixed $value
+     */
     public function __set($name, $value)
     {
-        if ($name == '$ref') {
+        if ($name === '$ref') {
             $name = 'ref';
         }
         $setter = 'set' . $name;
-        if (method_exists($this, $setter)) {
-            $this->$setter($value);
-        } else {
-            $this->$name = $value;
-        }
+
+        $this->$setter($value);
     }
+
+    public function __isset($name)
+    {
+        if ($name === '$ref') {
+            $name = 'ref';
+        }
+        $setter = 'set' . $name;
+
+        return method_exists($this, $setter);
+    }
+
+    public function __get($name)
+    {
+        if ($name === '$ref') {
+            $name = 'ref';
+        }
+        $setter = 'get' . $name;
+
+        return method_exists($this, $setter);
+    }
+
 
 //    public function offsetExists($offset)
 //    {

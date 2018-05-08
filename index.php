@@ -1,7 +1,7 @@
 <?php
 
 /** @var \Composer\Autoload\ClassLoader $autoLoader */
-$autoLoader = require_once __DIR__ . '/vendor/autoload.php';
+$autoLoader = require __DIR__ . '/vendor/autoload.php';
 $autoLoader->setPsr4('m8rge\\', __DIR__ . '/src');
 
 $app = new Silly\Application('swagger2slate', '@version@');

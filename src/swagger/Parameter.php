@@ -3,7 +3,7 @@
 namespace m8rge\swagger;
 
 
-class Parameter extends Object
+class Parameter extends BaseObject
 {
     /**
      * @var string
@@ -41,26 +41,25 @@ class Parameter extends Object
      */
     public $items;
 
-    public function setSchema($value)
+    public function setSchema($value): void
     {
         $this->schema = new Schema($value);
     }
 
-    public function setItems($value)
+    public function setItems($value): void
     {
         $this->items = new Schema($value);
     }
 
     public function __toString()
     {
-        if ($this->in == 'body') {
+        if ($this->in === 'body') {
             return (string)$this->schema;
-        } else {
-            if ($this->type != 'array') {
-                return $this->type;
-            } else {
-                return "array[$this->items]";
-            }
         }
+        if ($this->type !== 'array') {
+            return $this->type;
+        }
+
+        return "array[$this->items]";
     }
 }
