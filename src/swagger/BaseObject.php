@@ -18,10 +18,8 @@ class BaseObject // implements ArrayAccess
 
     public function setConfig(array $config = []): void
     {
-        if (!empty($config)) {
-            foreach ($config as $name => $value) {
-                $this->__set($name, $value);
-            }
+        foreach ($config as $name => $value) {
+            $this->__set($name, $value);
         }
     }
 
@@ -36,17 +34,16 @@ class BaseObject // implements ArrayAccess
         }
         $setter = 'set' . $name;
 
-        $this->$setter($value);
+        if (method_exists($this, $setter)) {
+            $this->$setter($value);
+        } else {
+            $this->$name = $value;
+        }
     }
 
     public function __isset($name)
     {
-        if ($name === '$ref') {
-            $name = 'ref';
-        }
-        $setter = 'set' . $name;
-
-        return method_exists($this, $setter);
+        return !empty($this->__get($name));
     }
 
     public function __get($name)
@@ -54,9 +51,13 @@ class BaseObject // implements ArrayAccess
         if ($name === '$ref') {
             $name = 'ref';
         }
-        $setter = 'get' . $name;
+        $getter = 'get' . $name;
 
-        return method_exists($this, $setter);
+        if (method_exists($this, $getter)) {
+            return $this->$getter($name);
+        }
+
+        return null;
     }
 
 

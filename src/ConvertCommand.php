@@ -144,10 +144,10 @@ class ConvertCommand
             'autoescape' => false,
         ]);
         $twig->addFilter(new Twig_SimpleFilter('newSchema', function ($data) {
-            return new Schema($data);
+            return new Schema(is_array($data) ? $data : []);
         }));
         $twig->addFilter(new Twig_SimpleFilter('newParameters', function ($data) {
-            return new Parameters($data);
+            return new Parameters(is_array($data) ? $data : []);
         }));
         $twig->addFilter(new Twig_SimpleFilter('multilineInTable', function ($data) {
             return str_replace("\n", '<br/>', $data);
